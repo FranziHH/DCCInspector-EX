@@ -16,7 +16,7 @@ DCC signal is detected for two minutes, it resumes when reset.
 
 ## Direct Connection
 
-How Find Out Which Pin used for direct connection?
+How find out which pin used for direct connection?
 in DCC-Ex:
   
 MotorDriver(byte power_pin, byte signal_pin, byte signal_pin2, int8_t brake_pin, byte current_pin,
