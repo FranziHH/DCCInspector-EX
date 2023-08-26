@@ -276,7 +276,12 @@ bool HttpManagerClass::begin(const char *ssid, const char *password, const char 
   Serial.print(F("\", IP address: "));
   Serial.println(WiFi.localIP());
   #if defined(USE_OLED)
-  OledDisplay.append("Connected!");
+    OledDisplay.append("Connected!");
+    // Shows IP Address on OLED
+    char buf[20];
+    IPAddress ip = WiFi.localIP();
+    sprintf(buf, "%s %u.%u.%u.%u", "IP:", ip[0], ip[1], ip[2], ip[3]);
+    OledDisplay.append(buf);
   #endif
 
   if (MDNS.begin(dnsName)) {

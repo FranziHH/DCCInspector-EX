@@ -198,23 +198,33 @@ void setup() {
   Serial.println(F("---"));
   Serial.println(F("DCC Packet Analyze initialising"));
 
-#ifdef LEDPIN_ACTIVE
-  pinMode(LEDPIN_ACTIVE, OUTPUT);
-#endif
-#ifdef LEDPIN_DECODING
-  pinMode(LEDPIN_DECODING, OUTPUT);
-#endif
-#ifdef LEDPIN_DECODING
-  pinMode(LEDPIN_DECODING, OUTPUT);
-#endif
-#ifdef LEDPIN_FAULT
-  pinMode(LEDPIN_FAULT, OUTPUT);
-#endif
+  #if defined(LED_BUILTIN)
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, 1);
+  #endif
+  
+  #ifdef LEDPIN_ACTIVE
+    pinMode(LEDPIN_ACTIVE, OUTPUT);
+    digitalWrite(LEDPIN_ACTIVE, 0);
+  #endif
+  #ifdef LEDPIN_LOCOSPEED
+    pinMode(LEDPIN_LOCOSPEED, OUTPUT);
+    digitalWrite(LEDPIN_LOCOSPEED, 0);
+  #endif
+  #ifdef LEDPIN_DECODING
+    pinMode(LEDPIN_DECODING, OUTPUT);
+    digitalWrite(LEDPIN_DECODING, 0);
+  #endif
+  #ifdef LEDPIN_FAULT
+    pinMode(LEDPIN_FAULT, OUTPUT);
+    digitalWrite(LEDPIN_FAULT, 0);
+  #endif
 
   // Enable pullup in case there's no external pullup resistor.
   // External resistor is preferred as it can be lower, so
   // improve the switching speed of the Optocoupler.
   pinMode(INPUTPIN, INPUT_PULLUP);
+  //pinMode(INPUTPIN, INPUT);
   Serial.print("INPUTPIN=");
   Serial.println(INPUTPIN);
 
@@ -228,38 +238,48 @@ void setup() {
           "    **"));
   }
 
-#if defined(USE_OLED)
-  // Start OLED display (if required).
-  OledDisplay.begin(SDA_OLED, SCL_OLED);
-#if defined(ARDUINO_HELTEC_WIFI_KIT_32)
-  // Read battery voltage from pin GPIO37
-  // The battery measurement is enabled via pin GPIO21
-  digitalWrite(21, 0);
-  analogSetWidth(12);  // 12 bits = 0-4095
-  analogSetPinAttenuation(37, ADC_11db);
-  adcAttachPin(37);
+  #if defined(USE_OLED)
+    // Start OLED display (if required).
+    OledDisplay.begin(SDA_OLED, SCL_OLED);
+    
+    #if defined(ARDUINO_HELTEC_WIFI_KIT_32) && !defined(DISABLE_BATTERY_WARNING)
+      // Read battery voltage from pin GPIO37
+      // The battery measurement is enabled via pin GPIO21
+      digitalWrite(21, 0);
+      analogSetWidth(12);  // 12 bits = 0-4095
+      analogSetPinAttenuation(37, ADC_11db);
+      adcAttachPin(37);
+    
+      uint32_t batValue = analogRead(37);
+      // An input value of around 2600 is obtained for a
+      // a measured battery voltage of 4100mV.  
+      uint16_t batMV = batValue * 41 / 26;
+      if (batMV < 3400) OledDisplay.append("Battery Low");
+      digitalWrite(21, 1);  // Disable battery monitor
+    #endif
 
-  uint32_t batValue = analogRead(37);
-  // An input value of around 2600 is obtained for a
-  // a measured battery voltage of 4100mV.  
-  uint16_t batMV = batValue * 41 / 26;
-  if (batMV < 3400) OledDisplay.append("Battery Low");
-  digitalWrite(21, 1);  // Disable battery monitor
+    // Shows Used InputPIN on OLED
+    OledDisplay.append("Initialising..");
+    char buf[10];
+    sprintf(buf, "%s %i", "PIN:", INPUTPIN);
+    OledDisplay.append(buf);
+  #endif
 
-#endif
-  OledDisplay.append("Initialising..");
-#endif
-
-// Start WiFi and HTTP server (if required).
-#if defined(USE_HTTPSERVER)
-  HttpManager.begin(WIFI_SSID, WIFI_PASSWORD, DNSNAME);
-#endif
-
+  // Start WiFi and HTTP server (if required).
+  #if defined(USE_HTTPSERVER)
+    HttpManager.begin(WIFI_SSID, WIFI_PASSWORD, DNSNAME);
+  #endif
+  
   // Set time for first output of statistics during calibration
   lastRefresh = millis();
   DCCStatistics.setRefreshTime(1);  // Finish calibrating after 1 second
 
   Serial.print(F("Calibrating... "));
+
+  #if defined(LED_BUILTIN)
+    digitalWrite(LED_BUILTIN, 0);
+  #endif
+  
 }
 
 //=======================================================================
@@ -313,24 +333,24 @@ void loop() {
       Serial.println("--");
     }
 
-// Output short version of DCC statistics to a buffer
-// for use by OLED
-#if defined(USE_OLED)
+  // Output short version of DCC statistics to a buffer
+  // for use by OLED
+  #if defined(USE_OLED)
     OledDisplay.writeShortStatistics(stats);
     OledDisplay.append(sbPacketDecode.getString());  // Append decoded packets
     // Update OLED
     OledDisplay.refresh();
-#endif
+  #endif
 
-// Output full stats for HTTPServer to use
-#if defined(USE_HTTPSERVER)
+  // Output full stats for HTTPServer to use
+  #if defined(USE_HTTPSERVER)
     HttpManager.setBuffer(sbPacketDecode.getString());
     HttpManager.writeHtmlStatistics(stats);
-#endif
+  #endif
 
     sbPacketDecode.reset();  // Empty decoded packet list.
 
-#if defined(ESP32)
+#if defined(ESP32) && !defined(DISABLE_DEEPSLEEP)
     // Check if time to go to sleep on ESP32
     inactivityCount += DCCStatistics.getRefreshTime();
     if (inactivityCount > 120) {

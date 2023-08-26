@@ -23,6 +23,11 @@
 #define ARDUINO_HELTEC_WIFI_KIT_32
 #endif
 
+// uncomment if you don't want ESP32 to go into DeepSleep
+#define DISABLE_DEEPSLEEP
+// disable Battery Warning
+#define DISABLE_BATTERY_WARNING
+
 #if defined(ESP_PLATFORM)
   #if !defined(ESP32)
     #define ESP32
@@ -113,10 +118,19 @@
 #define BUTTONPIN 0
 
 // LED pin definitions - uncomment and assign as required.
-//#define LEDPIN_ACTIVE 13    // Shows interrupts being received, ie DCC active
-//#define LEDPIN_LOCOSPEED 3  // Driven from loco speed packet for loco 3
-//#define LEDPIN_DECODING 7   // lights when a packet with valid checksum is received
-//#define LEDPIN_FAULT 6      // Lights when a checksum error or glitch is encountered.
+#if defined(ARDUINO_HELTEC_WIFI_KIT_32)
+  // ESP32 HELTEC
+  #define LEDPIN_ACTIVE 13     // Shows interrupts being received, ie DCC active
+  #define LEDPIN_DECODING 12   // lights when a packet with valid checksum is received
+  #define LEDPIN_FAULT 27      // Lights when a checksum error or glitch is encountered.
+  #define LEDPIN_LOCOSPEED 26  // Driven from loco speed packet for loco 3
+#else
+  // Default
+  //#define LEDPIN_ACTIVE 13    // Shows interrupts being received, ie DCC active
+  //#define LEDPIN_DECODING 7   // lights when a packet with valid checksum is received
+  //#define LEDPIN_FAULT 6      // Lights when a checksum error or glitch is encountered.
+  //#define LEDPIN_LOCOSPEED 3  // Driven from loco speed packet for loco 3
+#endif
 
 // Uncomment the following line to enable HTTP Server (ESP32 or ESP8266 only).
 #define USE_HTTPSERVER
