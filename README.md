@@ -14,7 +14,33 @@ more information.  Development boards such as the Heltec Kit 32 include OLED and
 can be used directly.  The ESP32 will go into deep sleep mode (to preserve battery when used stand-alone) if no input 
 DCC signal is detected for two minutes, it resumes when reset.
 
+## Direct Connection
+
+How Find Out Which Pin used for direct connection?
+in DCC-Ex:
+  
+MotorDriver(byte power_pin, byte signal_pin, byte signal_pin2, int8_t brake_pin, byte current_pin,
+             float senseFactor, unsigned int tripMilliamps, byte faultPin);
+             
+ #define STANDARD_MOTOR_SHIELD F("STANDARD_MOTOR_SHIELD"),                                                 \
+                               new MotorDriver(3, 12, UNUSED_PIN, 9, A0, 0.488, 1500, UNUSED_PIN), \
+                               new MotorDriver(11, 13, UNUSED_PIN, 8, A1, 0.488, 1500, UNUSED_PIN)
+
+ in this Case - standard MotorShield are the PINs
+  Track: Pin12
+  Prog:  Pin13
+
+## For track connection
+
+I use a 10nF capacitor at the input of the optocoupler. 
+This allowed me to minimize the disturbances. 
+But as soon as a locomotive is approached, the disturbances increase. 
+
+I haven't figured out how to filter interference better yet.
+
 ## Hardware Interface
+
+In this Case is in Source PullUp disabled!
 
 The device may be directly connected to a DCC controller of the same I/O voltage and earth, e.g. in a
 DCC++ or DCC++ EX system.  If it is used to monitor DCC signals, which are
