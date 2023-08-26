@@ -223,8 +223,8 @@ void setup() {
   // Enable pullup in case there's no external pullup resistor.
   // External resistor is preferred as it can be lower, so
   // improve the switching speed of the Optocoupler.
-  pinMode(INPUTPIN, INPUT_PULLUP);
-  //pinMode(INPUTPIN, INPUT);
+  //pinMode(INPUTPIN, INPUT_PULLUP);
+  pinMode(INPUTPIN, INPUT);
   Serial.print("INPUTPIN=");
   Serial.println(INPUTPIN);
 
