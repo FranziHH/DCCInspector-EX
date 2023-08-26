@@ -14,6 +14,10 @@ more information.  Development boards such as the Heltec Kit 32 include OLED and
 can be used directly.  The ESP32 will go into deep sleep mode (to preserve battery when used stand-alone) if no input 
 DCC signal is detected for two minutes, it resumes when reset.
 
+## OLED Display
+
+on the ESP32 the display of the IP address and the input PIN has been added
+
 ## Direct Connection
 
 How find out which pin used for direct connection?
