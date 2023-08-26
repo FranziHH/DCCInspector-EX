@@ -29,7 +29,9 @@ MotorDriver(byte power_pin, byte signal_pin, byte signal_pin2, int8_t brake_pin,
 ```
 
  in this Case - standard MotorShield are the PINs
+ 
   Track: Pin12
+  
   Prog:  Pin13
 
 ## For track connection
