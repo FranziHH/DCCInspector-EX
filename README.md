@@ -38,6 +38,8 @@ But as soon as a locomotive is approached, the disturbances increase.
 
 I haven't figured out how to filter interference better yet.
 
+![Optocoupler Circuit](assets/optocoupler_input.png "Optocoupler Circuit")
+
 ## Hardware Interface
 
 In this Case is in Source PullUp disabled!
